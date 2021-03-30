@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml
+    kompose.version: 1.20.0 (f3d54d784)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: data
+  name: data
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: data
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yaml
+        kompose.version: 1.20.0 (f3d54d784)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/myapp: "true"
+        io.kompose.service: data
+    spec:
+      containers:
+      - image: nazirakam/data:v2
+        name: db
+        ports:
+        - containerPort: 3306        
+        env:
+        - name: MYSQL_ALLOW_EMPTY_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: data-secret
+              key: MYSQL_ALLOW_EMPTY_PASSWORD 
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: data-secret
+              key: MYSQL_DATABASE 
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: data-secret
+              key: MYSQL_PASSWORD         
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: data-secret
+              key: MYSQL_ROOT_PASSWORD
+        resources: {}
+        volumeMounts:
+        - mountPath: "/var/lib/mysql-files"
+          name: nazira-pvc
+      volumes:
+        - name: nazira-pvc
+          persistentVolumeClaim:
+            claimName: nazira-pvc     
+      restartPolicy: Always
+status: {}
+

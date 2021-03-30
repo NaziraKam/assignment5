@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: back
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.20.0 (f3d54d784)
+  labels:
+    io.kompose.service: back
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: back
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.20.0 (f3d54d784)
+      labels:
+        io.kompose.network/myapp: "true"
+        io.kompose.service: back
+        app: back
+    spec:
+      containers:
+      - image: nazirakam/quotes-back:v1
+        name: api
+        env:
+        - name: SQLALCHEMY_DATABASE_URI 
+          valueFrom:
+            secretKeyRef:
+              name: back-secret
+              key: SQLALCHEMY_DATABASE_URI 
+        ports:
+        - containerPort: 3000
+      restartPolicy: Always
+

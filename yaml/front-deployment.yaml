@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.20.0 (f3d54d784)
+    #creationTimestamp: null
+  labels:
+    app: front
+    io.kompose.service: front
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: front
+  #strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.20.0 (f3d54d784)
+        #creationTimestamp: null
+      labels:
+        app: front
+        io.kompose.network/myapp: "true"
+        io.kompose.service: front
+    spec:
+      containers:
+      - image: nazirakam/front:v1
+        name: front
+        ports:
+        - containerPort: 80
+          #resources: {}
+      restartPolicy: Always
+      #status: {}
